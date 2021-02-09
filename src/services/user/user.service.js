@@ -1,4 +1,12 @@
+//model
 const User = require("../../models/user.model");
+
+// helper
+const {
+  splitFullname,
+  getEmailPattern,
+} = require("../../commons/lib/emailGuesser.helper");
+const constants = require("../../commons/lib/constants");
 
 /**
  * Gets all users with given query
@@ -19,9 +27,13 @@ function get(getQuery, model, options = {}) {
  * Creates new user and returns user
  * @param {object} userData The object that contains information about user to be created
  */
-function create(userData, model, options = {}) {
+async function create(userData, model, options = {}) {
+  const pattern = getEmailPattern(userData.fullname, userData.email);
+  const counter = await User.patternCount(pattern);
+  userData.emailPattern = `${pattern}: ${counter + 1}`;
   const newModel = new model(userData);
-  return newModel.create();
+  const newUser = newModel.create();
+  return newUser;
 }
 
 /**
@@ -65,6 +77,36 @@ function deleteOne(userId, data) {
   return User.findOneAndUpdate({ _id: userId }, data, { new: true }).exec();
 }
 
+async function emailGuesser(data = {}, model, query) {
+  const { fn, mn, ln } = splitFullname(data.fullname);
+  const fullnameArr = [fn, mn, ln];
+  // get users with given domain
+  const users = await get(
+    {
+      email: { $regex: new RegExp(`^[A-Za-z0-9._%+-]+@${data.domain}$`) },
+      ...query,
+    },
+    model
+  );
+  // now get all the possible combinations of emails and get their count
+  const userDetails = [];
+  for (let i = 0; i < users.length; i++) {
+    const names = users[i].email && users[i].email.split("@")[0];
+    if (fullnameArr.includes(...names.split("."))) {
+      const pattern =
+        users[i].emailPattern && users[i].emailPattern.split(":")[0];
+      const count = await User.patternCount(pattern);
+      userDetails.push({ email: users[i].email, count: count });
+    }
+  }
+  // for pattern with highest count
+  const maxCount = Math.max.apply(
+    Math,
+    userDetails.map(each => each.count)
+  );
+  return userDetails.find(e => e.count === maxCount);
+}
+
 const userService = {
   get,
   create,
@@ -72,6 +114,7 @@ const userService = {
   getOne,
   findById,
   deleteOne,
+  emailGuesser,
 };
 
 module.exports = userService;

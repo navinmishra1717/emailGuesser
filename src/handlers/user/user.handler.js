@@ -30,12 +30,11 @@ async function getUsers(req, res, next) {
  */
 async function createUser(req, res, next) {
   let user = req.body;
-  let Service = req.mockFunction ? req.mockFunction : userService;
   try {
     log.info("creating new user");
     user.createdAt = Date.now();
     user.updatedAt = Date.now();
-    const newUser = await Service.create(user, userModel);
+    const newUser = await userService.create(user, userModel);
     const msg = "user created successfully";
     log.info(msg);
     return Response.successResponse(res, msg, newUser);
@@ -122,12 +121,31 @@ async function deleteOne(req, res, next) {
   }
 }
 
+async function emailGuesser(req, res, next) {
+  const { fullname, domain } = req.query;
+  try {
+    const query = { isDeleted: false };
+    const email = await userService.emailGuesser(
+      { fullname, domain },
+      userModel,
+      query
+    );
+    const msg = "Email successfully guessed!!";
+    log.info(msg);
+    Response.successResponse(res, msg, email);
+  } catch (err) {
+    log.error(err);
+    next(err);
+  }
+}
+
 const userHandler = {
   getAllUsers: getUsers,
   createUser: createUser,
   updateUser: updateUser,
   getOneById: getOneById,
   deleteOne: deleteOne,
+  emailGuesser: emailGuesser,
 };
 
 module.exports = userHandler;

@@ -12,6 +12,8 @@ userRouter
   .get(userHandler.getAllUsers)
   .post(userHandler.createUser);
 
+userRouter.route(`${thisRoute}/email`).get(userHandler.emailGuesser);
+
 userRouter
   .route(`${thisRoute}/:id`)
   .get(userHandler.getOneById)
