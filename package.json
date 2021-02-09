@@ -1,0 +1,40 @@
+{
+  "name": "node-demo",
+  "version": "1.0.0",
+  "description": "A boilerplate for starting node based projects",
+  "main": "src/server.js",
+  "scripts": {
+    "test": "npx nyc mocha src/test/**/*.js --exit",
+    "start": "node src/server",
+    "dev": "npx nodemon",
+    "test:watch": "npx nyc mocha src/test/**/*.js --watch",
+    "lint": "npx eslint src --fix"
+  },
+  "author": "Navin Mishra",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "bunyan": "^1.8.12",
+    "dotenv": "^8.0.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.5.12",
+    "redis": "^3.0.2",
+    "sinon-mongoose": "^2.3.0",
+    "socket.io": "^3.0.3"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.3.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "faker": "^5.3.1",
+    "jest": "^26.6.3",
+    "mocha": "^6.1.4",
+    "node-mocks-http": "^1.10.1",
+    "nodemon": "^1.19.1",
+    "nyc": "^14.1.1",
+    "prettier": "^1.17.1",
+    "request": "^2.88.0",
+    "sinon": "^7.3.2"
+  }
+}
