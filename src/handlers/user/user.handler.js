@@ -121,6 +121,12 @@ async function deleteOne(req, res, next) {
   }
 }
 
+/**
+ *
+ * @param {object} req request object
+ * @param {object} res response object
+ * @param {function} next next function
+ */
 async function emailGuesser(req, res, next) {
   const { fullname, domain } = req.query;
   try {
