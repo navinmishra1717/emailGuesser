@@ -4,9 +4,9 @@ const mongoose = require("mongoose");
 const schema = mongoose.Schema;
 
 const User = new schema({
-  name: { type: String, required: true },
+  fullname: { type: String, required: true },
   email: { type: String, required: true },
-  isActive: { type: Boolean, required: true, default: false },
+  emailPattern: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   isDeleted: { type: Boolean, default: false },
@@ -22,6 +22,20 @@ User.methods.create = function() {
       }
       resolve(user);
     });
+  });
+};
+
+User.statics.patternCount = function(pattern) {
+  return new Promise((resolve, reject) => {
+    this.find(
+      { emailPattern: new RegExp(pattern, "i"), isDeleted: false },
+      function(err, result) {
+        if (err) {
+          reject(err);
+        }
+        resolve(result.length);
+      }
+    );
   });
 };
 
