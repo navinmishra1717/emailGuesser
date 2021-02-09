@@ -6,12 +6,12 @@ const {
   splitFullname,
   getEmailPattern,
 } = require("../../commons/lib/emailGuesser.helper");
-const constants = require("../../commons/lib/constants");
 
 /**
  * Gets all users with given query
- * @param {*} getQuery The object of queries to filter user
- * @param {*} options other data passed
+ * @param {object} getQuery The object of queries to filter user
+ * @param {object} model The model passed
+ * @param {object} options other data passed
  */
 function get(getQuery, model, options = {}) {
   const limit = options.limit || 100;
@@ -26,6 +26,8 @@ function get(getQuery, model, options = {}) {
 /**
  * Creates new user and returns user
  * @param {object} userData The object that contains information about user to be created
+ * @param {object} model The model passed
+ * @param {object} options other data passed
  */
 async function create(userData, model, options = {}) {
   const pattern = getEmailPattern(userData.fullname, userData.email);
@@ -49,7 +51,8 @@ function update(userId, userData) {
 /**
  * Gets user by given query
  * @param {string} userId The string which represents id of user
- * @param {string} options The query passed for user search
+ * @param {object} model The model passed
+ * @param {object} options The query passed for user search
  */
 
 function getOne(userId, model, options = {}) {
@@ -77,6 +80,12 @@ function deleteOne(userId, data) {
   return User.findOneAndUpdate({ _id: userId }, data, { new: true }).exec();
 }
 
+/**
+ *
+ * @param {object} data The object passed with data field
+ * @param {object} model The model passed need to access
+ * @param {object} query Query string passed
+ */
 async function emailGuesser(data = {}, model, query) {
   const { fn, mn, ln } = splitFullname(data.fullname);
   const fullnameArr = [fn, mn, ln];
