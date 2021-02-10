@@ -30,4 +30,6 @@ Node.js
 
 > Test watch mode: npm run test:watch
 
+> Test coverage mode: npm run test:coverage
+
 > Run lint: npm run lint

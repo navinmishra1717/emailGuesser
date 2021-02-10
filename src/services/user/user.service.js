@@ -1,11 +1,12 @@
 //model
 const User = require("../../models/user.model");
 
-// helper
+// helpers
 const {
   splitFullname,
   getEmailPattern,
 } = require("../../commons/lib/emailGuesser.helper");
+const { checkSubArray } = require("../../commons/lib/arrayHelper");
 
 /**
  * Gets all users with given query
@@ -85,12 +86,14 @@ function deleteOne(userId, data) {
  * @param {object} data The object passed with data field
  * @param {object} model The model passed need to access
  * @param {object} query Query string passed
+ * @param {object} options Other required data/function passed
  */
-async function emailGuesser(data = {}, model, query) {
+async function emailGuesser(data = {}, model, query, options = {}) {
   const { fn, mn, ln } = splitFullname(data.fullname);
   const fullnameArr = [fn, mn, ln];
+  const getFunction = options.getFunction || get;
   // get users with given domain
-  const users = await get(
+  const users = await getFunction(
     {
       email: { $regex: new RegExp(`^[A-Za-z0-9._%+-]+@${data.domain}$`) },
       ...query,
@@ -101,19 +104,20 @@ async function emailGuesser(data = {}, model, query) {
   const userDetails = [];
   for (let i = 0; i < users.length; i++) {
     const names = users[i].email && users[i].email.split("@")[0];
-    if (fullnameArr.includes(...names.split("."))) {
+    if (checkSubArray(names.split("."), fullnameArr)) {
       const pattern =
         users[i].emailPattern && users[i].emailPattern.split(":")[0];
-      const count = await User.patternCount(pattern);
+      const count = await model.patternCount(pattern);
       userDetails.push({ email: users[i].email, count: count });
     }
   }
+
   // for pattern with highest count
   const maxCount = Math.max.apply(
     Math,
     userDetails.map(each => each.count)
   );
-  return userDetails.find(e => e.count === maxCount);
+  return userDetails.length && userDetails.find(e => e.count === maxCount);
 }
 
 const userService = {
