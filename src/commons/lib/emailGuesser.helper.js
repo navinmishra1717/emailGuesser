@@ -28,7 +28,7 @@ const getEmailPattern = (fullname, email) => {
     pattern = constants.firstAndMiddle;
   } else if (splitEmail === `${fn}.${ln}`) {
     pattern = constants.firstAndLast;
-  } else if (`${fn}.${mn}.${ln}`) {
+  } else {
     pattern = constants.full;
   }
   return pattern;

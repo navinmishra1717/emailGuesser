@@ -129,16 +129,23 @@ async function deleteOne(req, res, next) {
  */
 async function emailGuesser(req, res, next) {
   const { fullname, domain } = req.query;
+  const service = req.mockFunc ? req.mockFunc : userService;
   try {
     const query = { isDeleted: false };
-    const email = await userService.emailGuesser(
+    const emailData = await service.emailGuesser(
       { fullname, domain },
       userModel,
       query
     );
+    if (!emailData.email) {
+      return Response.errorResponse(
+        res,
+        "No email found for given name or domain!!"
+      );
+    }
     const msg = "Email successfully guessed!!";
     log.info(msg);
-    Response.successResponse(res, msg, email);
+    return Response.successResponse(res, msg, emailData);
   } catch (err) {
     log.error(err);
     next(err);

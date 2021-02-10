@@ -4,10 +4,11 @@
   "description": "A boilerplate for starting node based projects",
   "main": "src/server.js",
   "scripts": {
-    "test": "npx nyc mocha src/test/**/*.js --exit",
+    "test": "jest test/",
+    "test:coverage": "jest test/ --coverage",
+    "test:watch": "jest test/ --watch",
     "start": "node src/server",
     "dev": "npx nodemon",
-    "test:watch": "npx nyc mocha src/test/**/*.js --watch",
     "lint": "npx eslint src --fix"
   },
   "author": "Navin Mishra",
